@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<!-- saved from url=(0047)file:///C:/Users/Cebrameta/Downloads/index.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Inevisual — Sistema de Soberanía Multidimensional</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link href="./Inevisual — Sistema de Soberanía Multidimensional_files/css2" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #FFD700;
+      --gold-dim: rgba(255,215,0,0.15);
+      --gold-glow: rgba(255,215,0,0.4);
+      --cyan: #00D4FF;
+      --cyan-dim: rgba(0,212,255,0.12);
+      --violet: #9B59B6;
+      --violet-dim: rgba(155,89,182,0.15);
+      --rose: #FF69B4;
+      --rose-dim: rgba(255,105,180,0.12);
+      --ink: #000000;
+      --text: #ffffff;
+      --text-muted: rgba(255,255,255,0.45);
+      --panel-bg: rgba(0,0,0,0.88);
+      --border-radius: 24px;
+      --transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body, html {
+      background: #000;
+      color: var(--text);
+      font-family: 'Exo 2', sans-serif;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* ── CANVAS ── */
+    #canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 1;
+    }
+
+    /* ── PARTICLE LAYER ── */
+    #particles {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* ── LAYOUT ── */
+    .layout {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr 340px 1fr;
+      grid-template-rows: 1fr;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+    }
+
+    /* ── LEFT PANEL: INFO + SYMBOLS ── */
+    .panel-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px 40px 40px;
+      gap: 16px;
+      pointer-events: auto;
+    }
+
+    .symbol-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      max-width: 260px;
+    }
+
+    .symbol-card {
+      background: var(--panel-bg);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 14px 12px;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .symbol-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      border-radius: 14px;
+    }
+
+    .symbol-card.active::before { opacity: 1; }
+    .symbol-card[data-mode="abundancia"]::before { background: var(--gold-dim); }
+    .symbol-card[data-mode="proteccion"]::before { background: var(--violet-dim); }
+    .symbol-card[data-mode="soberania"]::before { background: var(--cyan-dim); }
+    .symbol-card[data-mode="atraccion"]::before { background: var(--rose-dim); }
+
+    .symbol-card:hover { transform: translateY(-2px); }
+    .symbol-card.active { border-color: currentColor; }
+    .symbol-card[data-mode="abundancia"].active { color: var(--gold); border-color: var(--gold); box-shadow: 0 0 20px var(--gold-glow); }
+    .symbol-card[data-mode="proteccion"].active { color: var(--violet); border-color: var(--violet); box-shadow: 0 0 20px rgba(155,89,182,0.4); }
+    .symbol-card[data-mode="soberania"].active { color: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 20px rgba(0,212,255,0.4); }
+    .symbol-card[data-mode="atraccion"].active { color: var(--rose); border-color: var(--rose); box-shadow: 0 0 20px rgba(255,105,180,0.4); }
+
+    .symbol-icon { font-size: 1.6rem; margin-bottom: 6px; }
+    .symbol-name { font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; font-weight: 300; }
+    .symbol-hz { font-size: 0.65rem; font-weight: 200; margin-top: 4px; }
+
+    .section-label {
+      font-size: 0.5rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 300;
+    }
+
+    .dimension-status {
+      background: var(--panel-bg);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      padding: 14px 16px;
+      width: 100%;
+      max-width: 260px;
+    }
+
+    .status-label {
+      font-size: 0.45rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    #dimension-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--gold);
+      transition: color 1s ease;
+    }
+
+    #mantra-text {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-style: italic;
+      line-height: 1.4;
+    }
+
+    .freq-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .freq-label { font-size: 0.5rem; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; }
+    #freq-display {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      color: var(--gold);
+      transition: color 1s ease;
+    }
+
+    .freq-track {
+      flex: 1;
+      height: 2px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    #freq-fill {
+      height: 100%;
+      width: 60%;
+      background: var(--gold);
+      border-radius: 2px;
+      transition: width 2s ease, background 1s ease;
+    }
+
+    /* ── CENTER PANEL: MAIN CORE ── */
+    .panel-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 0;
+      gap: 20px;
+      pointer-events: auto;
+    }
+
+    .header-mark {
+      text-align: center;
+    }
+
+    .header-mark h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 200;
+      font-size: 2.4rem;
+      letter-spacing: 14px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    .header-mark .tagline {
+      font-size: 0.42rem;
+      letter-spacing: 5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 300;
+      margin-top: 4px;
+    }
+
+    /* Main Activate Button */
+    .core-btn {
+      position: relative;
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 14px 36px;
+      font-family: 'Exo 2', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 100px;
+      transition: all 0.4s ease;
+      font-weight: 300;
+    }
+
+    .core-btn:hover {
+      background: var(--gold);
+      color: #000;
+      box-shadow: 0 0 30px var(--gold-glow);
+    }
+
+    .core-btn.active {
+      background: rgba(255,215,0,0.08);
+      box-shadow: 0 0 40px var(--gold-glow);
+    }
+
+    /* Pulse ring around button */
+    .btn-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pulse-ring {
+      position: absolute;
+      border-radius: 100px;
+      border: 1px solid var(--gold);
+      opacity: 0;
+      animation: none;
+      pointer-events: none;
+    }
+
+    .pulse-ring.active {
+      animation: pulse-out 2.5s infinite ease-out;
+    }
+
+    @keyframes pulse-out {
+      0% { transform: scale(1); opacity: 0.6; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+
+    /* Auto-cycle toggle */
+    .auto-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toggle-label { font-size: 0.5rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; }
+
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      cursor: pointer;
+      transition: background 0.4s ease;
+    }
+
+    .toggle.on { background: rgba(255,215,0,0.2); border-color: var(--gold); }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.4);
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .toggle.on::after { transform: translateX(18px); background: var(--gold); }
+
+    /* Cycle timer */
+    .cycle-display {
+      font-size: 0.45rem;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      text-align: center;
+      height: 14px;
+    }
+
+    /* Volume control */
+    .vol-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 200px;
+    }
+
+    .vol-icon { font-size: 0.8rem; cursor: pointer; color: var(--text-muted); }
+    .vol-slider {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 2px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      outline: none;
+    }
+
+    .vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      cursor: pointer;
+    }
+
+    /* Decree display */
+    .decree-box {
+      background: var(--panel-bg);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 14px 18px;
+      width: 280px;
+      text-align: center;
+    }
+
+    .decree-label {
+      font-size: 0.42rem;
+      letter-spacing: 4px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    #decree-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.78rem;
+      font-style: italic;
+      color: var(--text-muted);
+      line-height: 1.6;
+      transition: all 1s ease;
+    }
+
+    /* ── RIGHT PANEL: BITÁCORA ── */
+    .panel-right {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+      padding: 40px 40px 40px 20px;
+      gap: 16px;
+      pointer-events: auto;
+    }
+
+    .bitacora-panel {
+      background: var(--panel-bg);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 20px;
+      width: 100%;
+      max-width: 260px;
+    }
+
+    .bitacora-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .bitacora-title {
+      font-size: 0.48rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    #log-count {
+      font-size: 0.5rem;
+      color: var(--gold);
+      letter-spacing: 1px;
+    }
+
+    .log-input-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .log-input {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text);
+      padding: 8px 10px;
+      font-size: 0.68rem;
+      font-family: 'Exo 2', sans-serif;
+      outline: none;
+      border-radius: 8px;
+      transition: border-color 0.3s ease;
+    }
+
+    .log-input:focus { border-color: var(--gold); }
+    .log-input::placeholder { color: rgba(255,255,255,0.2); font-size: 0.62rem; }
+
+    .log-btn {
+      background: var(--gold);
+      border: none;
+      color: #000;
+      padding: 8px 12px;
+      font-size: 0.55rem;
+      font-family: 'Exo 2', sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .log-btn:hover { box-shadow: 0 0 15px var(--gold-glow); }
+
+    .log-category {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .cat-btn {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      padding: 5px;
+      font-size: 0.48rem;
+      font-family: 'Exo 2', sans-serif;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .cat-btn.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+
+    #log-list {
+      max-height: 180px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    #log-list::-webkit-scrollbar { width: 2px; }
+    #log-list::-webkit-scrollbar-track { background: transparent; }
+    #log-list::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.3); border-radius: 2px; }
+
+    .log-entry {
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      padding: 8px 10px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+    .log-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .log-dot.dinero { background: var(--gold); }
+    .log-dot.paz { background: var(--cyan); }
+    .log-dot.atraccion { background: var(--rose); }
+    .log-dot.general { background: var(--text-muted); }
+
+    .log-body { flex: 1; }
+    .log-text { font-size: 0.62rem; line-height: 1.3; color: rgba(255,255,255,0.75); }
+    .log-time { font-size: 0.45rem; color: var(--text-muted); margin-top: 2px; letter-spacing: 1px; }
+
+    .log-empty {
+      text-align: center;
+      padding: 20px 0;
+      font-size: 0.55rem;
+      color: var(--text-muted);
+      font-style: italic;
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .stat-item { text-align: center; }
+    .stat-num { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: var(--gold); }
+    .stat-lbl { font-size: 0.42rem; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
+
+    /* ── CHANNEL SELECTOR (bottom) ── */
+    .channel-bar {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      gap: 10px;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 100px;
+      padding: 10px 16px;
+      backdrop-filter: blur(12px);
+      pointer-events: auto;
+    }
+
+    .ch-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-muted);
+      padding: 7px 14px;
+      font-family: 'Exo 2', sans-serif;
+      font-size: 0.52rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 100px;
+      transition: all 0.4s ease;
+      font-weight: 300;
+    }
+
+    .ch-btn .ch-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .ch-btn:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+    .ch-btn.active.abundancia  { border-color: var(--gold);   color: var(--gold);   background: var(--gold-dim);   box-shadow: 0 0 15px var(--gold-glow); }
+    .ch-btn.active.proteccion  { border-color: var(--violet); color: var(--violet); background: var(--violet-dim); box-shadow: 0 0 15px rgba(155,89,182,0.3); }
+    .ch-btn.active.soberania   { border-color: var(--cyan);   color: var(--cyan);   background: var(--cyan-dim);   box-shadow: 0 0 15px rgba(0,212,255,0.3); }
+    .ch-btn.active.atraccion   { border-color: var(--rose);   color: var(--rose);   background: var(--rose-dim);   box-shadow: 0 0 15px rgba(255,105,180,0.3); }
+
+    /* ── TOP STATUS BAR ── */
+    .status-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 30px;
+      background: rgba(0,0,0,0.6);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      backdrop-filter: blur(10px);
+      pointer-events: none;
+    }
+
+    .status-left { font-size: 0.45rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; }
+    .status-center { display: flex; align-items: center; gap: 6px; }
+    .status-dot { width: 5px; height: 5px; border-radius: 50%; background: #555; transition: background 0.5s ease; }
+    .status-dot.live { background: var(--gold); box-shadow: 0 0 8px var(--gold-glow); animation: blink 2s infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .status-state { font-size: 0.45rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; }
+    .status-right { font-size: 0.45rem; letter-spacing: 2px; color: var(--text-muted); }
+
+    /* ── FULLSCREEN BTN ── */
+    .fs-btn {
+      position: fixed;
+      top: 12px; right: 80px;
+      z-index: 30;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text-muted);
+      padding: 5px 10px;
+      font-size: 0.45rem;
+      letter-spacing: 2px;
+      cursor: pointer;
+      border-radius: 6px;
+      font-family: 'Exo 2', sans-serif;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+
+    .fs-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .panel-left, .panel-right { align-items: center; padding: 20px; }
+      .panel-center { padding: 30px 20px; }
+      .symbol-grid, .dimension-status, .bitacora-panel { max-width: 340px; }
+
+      .channel-bar { bottom: 20px; padding: 8px 12px; gap: 6px; }
+      .ch-btn { padding: 6px 10px; font-size: 0.45rem; gap: 4px; }
+      .ch-btn span { display: none; }
+
+      .header-mark h1 { font-size: 1.8rem; letter-spacing: 10px; }
+
+      body { overflow-y: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="canvas" width="1920" height="919"></canvas>
+
+  <!-- Top Status Bar -->
+  <div class="status-bar">
+    <div class="status-left">kaelion.site · inevisual</div>
+    <div class="status-center">
+      <div class="status-dot live" id="live-dot"></div>
+      <div class="status-state" id="live-state">ESCUDO DE SOBERANÍA</div>
+    </div>
+    <div class="status-right" id="clock-display">3:06:27 p.m.</div>
+  </div>
+
+  <!-- Fullscreen -->
+  <button class="fs-btn" onclick="toggleFS()">⛶ Pantalla</button>
+
+  <!-- Layout -->
+  <div class="layout">
+
+    <!-- LEFT: Symbols & Status -->
+    <div class="panel-left">
+      <div class="section-label">Geometría Sagrada</div>
+      <div class="symbol-grid">
+        <div class="symbol-card" data-mode="abundancia" onclick="setModeManual(&#39;abundancia&#39;)">
+          <div class="symbol-icon">⟳</div>
+          <div class="symbol-name">Toroide</div>
+          <div class="symbol-hz">888 Hz</div>
+        </div>
+        <div class="symbol-card" data-mode="proteccion" onclick="setModeManual(&#39;proteccion&#39;)">
+          <div class="symbol-icon">✦</div>
+          <div class="symbol-name">Metatrón</div>
+          <div class="symbol-hz">417 Hz</div>
+        </div>
+        <div class="symbol-card active" data-mode="soberania" onclick="setModeManual(&#39;soberania&#39;)">
+          <div class="symbol-icon">△</div>
+          <div class="symbol-name">Merkabah</div>
+          <div class="symbol-hz">528 Hz</div>
+        </div>
+        <div class="symbol-card" data-mode="atraccion" onclick="setModeManual(&#39;atraccion&#39;)">
+          <div class="symbol-icon">❋</div>
+          <div class="symbol-name">Vesica</div>
+          <div class="symbol-hz">639 Hz</div>
+        </div>
+      </div>
+
+      <div class="dimension-status">
+        <div class="status-label">Canal Activo</div>
+        <div id="dimension-name" style="color: rgb(0, 212, 255);">ESCUDO DE SOBERANÍA</div>
+        <div id="mantra-text">Espacio libre de interferencias. Mi presencia es intocable.</div>
+        <div class="freq-bar">
+          <div class="freq-label">Hz</div>
+          <div id="freq-display" style="color: rgb(0, 212, 255);">528 Hz</div>
+          <div class="freq-track"><div id="freq-fill" style="width: 46.4968%; background: rgb(0, 212, 255);"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER: Core -->
+    <div class="panel-center">
+      <div class="header-mark">
+        <h1>INEVISUAL</h1>
+        <div class="tagline">Sistema de Soberanía Multidimensional</div>
+      </div>
+
+      <div class="btn-wrap">
+        <div class="pulse-ring active" id="pulse-ring" style="width:160px; height:44px;"></div>
+        <button class="core-btn active" id="main-btn" onclick="iniciarSistema()">Blindaje Activo</button>
+      </div>
+
+      <div class="auto-row">
+        <div class="toggle-label">Auto-Ciclo</div>
+        <div class="toggle on" id="auto-toggle" onclick="toggleAuto()"></div>
+        <div class="toggle-label">Modo Continuo</div>
+      </div>
+
+      <div class="cycle-display" id="cycle-display">Próximo ciclo en 3s</div>
+
+      <div class="vol-row">
+        <span class="vol-icon" onclick="toggleMute()">🔊</span>
+        <input type="range" class="vol-slider" id="vol-slider" min="0" max="100" value="30" oninput="setVolume(this.value)">
+      </div>
+
+      <div class="decree-box">
+        <div class="decree-label">Decreto de Activación</div>
+        <div id="decree-text">Yo activo este portal bajo la ley de soberanía absoluta. Mi espacio es impenetrable y libre. Aquí y ahora.</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Bitácora -->
+    <div class="panel-right">
+      <div class="section-label">Bitácora de Manifestación</div>
+      <div class="bitacora-panel">
+        <div class="bitacora-header">
+          <div class="bitacora-title">Registro de Abundancia</div>
+          <div id="log-count">1 registros</div>
+        </div>
+
+        <div class="log-category">
+          <button class="cat-btn active" data-cat="dinero" onclick="setCategory(this, &#39;dinero&#39;)">Dinero</button>
+          <button class="cat-btn" data-cat="paz" onclick="setCategory(this, &#39;paz&#39;)">Paz</button>
+          <button class="cat-btn" data-cat="atraccion" onclick="setCategory(this, &#39;atraccion&#39;)">Atracción</button>
+          <button class="cat-btn" data-cat="general" onclick="setCategory(this, &#39;general&#39;)">Otro</button>
+        </div>
+
+        <div class="log-input-row">
+          <input type="text" class="log-input" id="log-input" placeholder="Escribe tu éxito…" onkeydown="if(event.key===&#39;Enter&#39;)anclar()">
+          <button class="log-btn" onclick="anclar()">Anclar</button>
+        </div>
+
+        <div id="log-list">
+      <div class="log-entry">
+        <div class="log-dot dinero"></div>
+        <div class="log-body">
+          <div class="log-text">Nadie me molesta, ni me juzga, estoy protegido e invisible</div>
+          <div class="log-time">03:01 p.m. · 639Hz</div>
+        </div>
+      </div>
+    </div>
+
+        <div class="stats-row">
+          <div class="stat-item">
+            <div class="stat-num" id="stat-dinero">1</div>
+            <div class="stat-lbl">Dinero</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" id="stat-paz">0</div>
+            <div class="stat-lbl">Paz</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" id="stat-total">1</div>
+            <div class="stat-lbl">Total</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Channel Bar -->
+  <div class="channel-bar">
+    <button class="ch-btn abundancia" data-mode="abundancia" onclick="setModeManual(&#39;abundancia&#39;)">
+      <div class="ch-dot" style="background:var(--gold)"></div>
+      <span>Oro Líquido · 888Hz</span>
+    </button>
+    <button class="ch-btn proteccion" data-mode="proteccion" onclick="setModeManual(&#39;proteccion&#39;)">
+      <div class="ch-dot" style="background:var(--violet)"></div>
+      <span>Metatrón · 417Hz</span>
+    </button>
+    <button class="ch-btn soberania active" data-mode="soberania" onclick="setModeManual(&#39;soberania&#39;)">
+      <div class="ch-dot" style="background:var(--cyan)"></div>
+      <span>Soberanía · 528Hz</span>
+    </button>
+    <button class="ch-btn atraccion" data-mode="atraccion" onclick="setModeManual(&#39;atraccion&#39;)">
+      <div class="ch-dot" style="background:var(--rose)"></div>
+      <span>Magnetismo · 639Hz</span>
+    </button>
+  </div>
+
+  <script>
+  // ─── DATA ───────────────────────────────────────────────────────────────────
+  const DIMENSIONES = {
+    abundancia: {
+      nombre: "FLUJO DE ORO LÍQUIDO",
+      hz: 888,
+      color: "#FFD700",
+      colorVar: "var(--gold)",
+      mantra: "Abundancia infinita en Inevisual. El dinero fluye hacia mí.",
+      decreto: "A través de este canal de 888Hz, sincronizo mi energía con el flujo del oro líquido y la abundancia infinita.",
+      modo: "abundancia"
+    },
+    proteccion: {
+      nombre: "ESCUDO DE METATRÓN",
+      hz: 417,
+      color: "#9B59B6",
+      colorVar: "var(--violet)",
+      mantra: "Las interferencias se disuelven en el vacío. Mi espacio es inviolable.",
+      decreto: "Bajo la protección del Cubo de Metatrón, sello mis cuatro cuerpos. Las molestias son desplazadas a su propio plano.",
+      modo: "proteccion"
+    },
+    soberania: {
+      nombre: "ESCUDO DE SOBERANÍA",
+      hz: 528,
+      color: "#00D4FF",
+      colorVar: "var(--cyan)",
+      mantra: "Espacio libre de interferencias. Mi presencia es intocable.",
+      decreto: "Yo activo este portal bajo la ley de soberanía absoluta. Mi espacio es impenetrable y libre. Aquí y ahora.",
+      modo: "soberania"
+    },
+    atraccion: {
+      nombre: "MAGNETISMO TOTAL",
+      hz: 639,
+      color: "#FF69B4",
+      colorVar: "var(--rose)",
+      mantra: "Atracción y armonía divina. Soy un polo de luz irresistible.",
+      decreto: "A través de 639Hz, expando mi campo electromagnético. Atracción y armonía fluyen hacia mí naturalmente.",
+      modo: "atraccion"
+    }
+  };
+
+  // ─── STATE ───────────────────────────────────────────────────────────────────
+  let audioCtx = null, osc = null, gainNode = null;
+  let modeActual = 'abundancia';
+  let isActive = false;
+  let autoEnabled = false;
+  let autoCycleTimer = null;
+  let cycleCountdown = 12;
+  let countdownInterval = null;
+  let muted = false;
+  let logEntries = [];
+  let currentCat = 'dinero';
+  let stats = { dinero: 0, paz: 0, atraccion: 0, general: 0 };
+
+  // ─── CANVAS ──────────────────────────────────────────────────────────────────
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  let angle = 0;
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function drawGeometry() {
+    const W = canvas.width, H = canvas.height;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    ctx.fillRect(0, 0, W, H);
+
+    const cx = W / 2, cy = H / 2;
+    const dim = DIMENSIONES[modeActual];
+    const col = dim.color;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+    ctx.lineWidth = 1;
+
+    if (modeActual === 'abundancia') {
+      // TOROIDE ÁUREO
+      ctx.strokeStyle = col + '80';
+      for (let i = 0; i < 24; i++) {
+        ctx.rotate(Math.PI / 12);
+        ctx.beginPath();
+        ctx.ellipse(45, 0, 110, 230, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      // Inner glow ring
+      ctx.strokeStyle = col + 'cc';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, 80, 0, Math.PI * 2);
+      ctx.stroke();
+
+    } else if (modeActual === 'proteccion') {
+      // CUBO DE METATRÓN
+      const r = 155;
+      ctx.strokeStyle = col + '70';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 6; i++) {
+        const x = r * Math.cos(i * Math.PI / 3);
+        const y = r * Math.sin(i * Math.PI / 3);
+        ctx.beginPath();
+        ctx.arc(x, y, 58, 0, Math.PI * 2);
+        ctx.stroke();
+        for (let j = 0; j < 6; j++) {
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(r * Math.cos(j * Math.PI / 3), r * Math.sin(j * Math.PI / 3));
+          ctx.stroke();
+        }
+      }
+      ctx.strokeStyle = col + 'aa';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, r + 58, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(0, 0, 58, 0, Math.PI * 2);
+      ctx.stroke();
+
+    } else if (modeActual === 'soberania') {
+      // MERKABAH (estrella de David tridimensional)
+      ctx.strokeStyle = col + '80';
+      ctx.lineWidth = 1.2;
+      for (let k = 0; k < 3; k++) {
+        ctx.save();
+        ctx.rotate(k * Math.PI / 1.5);
+        ctx.beginPath();
+        ctx.moveTo(0, -175);
+        ctx.lineTo(140, 100);
+        ctx.lineTo(-140, 100);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+      }
+      // Second rotated star
+      ctx.save();
+      ctx.rotate(Math.PI / 3);
+      ctx.strokeStyle = col + '50';
+      for (let k = 0; k < 3; k++) {
+        ctx.save();
+        ctx.rotate(k * Math.PI / 1.5);
+        ctx.beginPath();
+        ctx.moveTo(0, -175);
+        ctx.lineTo(140, 100);
+        ctx.lineTo(-140, 100);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+      }
+      ctx.restore();
+
+    } else if (modeActual === 'atraccion') {
+      // FLOR DE LA VIDA / VESICA PISCIS
+      ctx.strokeStyle = col + '60';
+      ctx.lineWidth = 1;
+      const R = 70;
+      ctx.beginPath();
+      ctx.arc(0, 0, R, 0, Math.PI * 2);
+      ctx.stroke();
+      for (let i = 0; i < 6; i++) {
+        const px = R * Math.cos(i * Math.PI / 3);
+        const py = R * Math.sin(i * Math.PI / 3);
+        ctx.beginPath();
+        ctx.arc(px, py, R, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      // Outer ring
+      ctx.strokeStyle = col + '40';
+      ctx.beginPath();
+      ctx.arc(0, 0, R * 2, 0, Math.PI * 2);
+      ctx.stroke();
+      // Connecting lines from center
+      ctx.strokeStyle = col + '30';
+      for (let i = 0; i < 12; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(160 * Math.cos(i * Math.PI / 6), 160 * Math.sin(i * Math.PI / 6));
+        ctx.stroke();
+      }
+    }
+
+    ctx.restore();
+
+    // Slow outer aura pulse
+    const pulse = Math.sin(Date.now() * 0.001) * 0.3 + 0.7;
+    ctx.save();
+    ctx.translate(cx, cy);
+    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, 320);
+    grad.addColorStop(0, 'transparent');
+    grad.addColorStop(0.7, 'transparent');
+    grad.addColorStop(1, DIMENSIONES[modeActual].color + Math.floor(pulse * 25).toString(16).padStart(2,'0'));
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(0, 0, 320, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+
+    angle += isActive ? 0.005 : 0.001;
+    requestAnimationFrame(drawGeometry);
+  }
+
+  drawGeometry();
+
+  // ─── AUDIO ───────────────────────────────────────────────────────────────────
+  function initAudio() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    osc = audioCtx.createOscillator();
+    gainNode = audioCtx.createGain();
+    osc.type = 'sine';
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    osc.start();
+  }
+
+  function setAudioFreq(hz) {
+    if (!osc || !audioCtx) return;
+    osc.frequency.exponentialRampToValueAtTime(hz, audioCtx.currentTime + 2);
+  }
+
+  function setVolume(val) {
+    if (!gainNode || !audioCtx) return;
+    const v = val / 100 * 0.08;
+    gainNode.gain.linearRampToValueAtTime(muted ? 0 : v, audioCtx.currentTime + 0.1);
+  }
+
+  function toggleMute() {
+    muted = !muted;
+    document.querySelector('.vol-icon').textContent = muted ? '🔇' : '🔊';
+    setVolume(document.getElementById('vol-slider').value);
+  }
+
+  // ─── MODE MANAGEMENT ─────────────────────────────────────────────────────────
+  function applyMode(mode) {
+    modeActual = mode;
+    const dim = DIMENSIONES[mode];
+
+    // Update UI text
+    document.getElementById('dimension-name').textContent = dim.nombre;
+    document.getElementById('dimension-name').style.color = dim.color;
+    document.getElementById('mantra-text').textContent = dim.mantra;
+    document.getElementById('freq-display').textContent = dim.hz + ' Hz';
+    document.getElementById('freq-display').style.color = dim.color;
+    document.getElementById('decree-text').textContent = dim.decreto;
+
+    // Freq bar fill: map 417–888 to 30–100%
+    const pct = ((dim.hz - 417) / (888 - 417)) * 70 + 30;
+    document.getElementById('freq-fill').style.width = pct + '%';
+    document.getElementById('freq-fill').style.background = dim.color;
+
+    // Symbol cards
+    document.querySelectorAll('.symbol-card').forEach(c => {
+      c.classList.toggle('active', c.dataset.mode === mode);
+    });
+
+    // Channel bar buttons
+    document.querySelectorAll('.ch-btn').forEach(b => {
+      b.classList.remove('active');
+      if (b.dataset.mode === mode) b.classList.add('active');
+    });
+
+    // Status bar
+    document.getElementById('live-state').textContent = dim.nombre;
+
+    // Audio
+    if (isActive) {
+      setAudioFreq(dim.hz);
+      const volEl = document.getElementById('vol-slider');
+      const vol = parseInt(volEl.value) / 100 * 0.08;
+      gainNode.gain.linearRampToValueAtTime(muted ? 0 : vol, audioCtx.currentTime + 0.1);
+    }
+  }
+
+  function setModeManual(mode) {
+    if (autoEnabled) {
+      // Pause auto and resume after 30s
+      clearAutoCycle();
+      setTimeout(() => { if (autoEnabled) startAutoCycle(); }, 30000);
+    }
+    applyMode(mode);
+  }
+
+  // ─── SYSTEM INIT ─────────────────────────────────────────────────────────────
+  function iniciarSistema() {
+    if (isActive) return;
+    isActive = true;
+    initAudio();
+
+    const btn = document.getElementById('main-btn');
+    btn.textContent = 'Blindaje Activo';
+    btn.classList.add('active');
+
+    document.getElementById('live-dot').classList.add('live');
+    document.getElementById('pulse-ring').classList.add('active');
+
+    // Start audio
+    const vol = parseInt(document.getElementById('vol-slider').value) / 100 * 0.08;
+    gainNode.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 2);
+
+    applyMode(modeActual);
+
+    // Auto-enable cycle
+    autoEnabled = true;
+    document.getElementById('auto-toggle').classList.add('on');
+    startAutoCycle();
+  }
+
+  // ─── AUTO CYCLE ──────────────────────────────────────────────────────────────
+  const modeOrder = ['abundancia', 'proteccion', 'soberania', 'atraccion'];
+  let modeIndex = 0;
+
+  function startAutoCycle() {
+    cycleCountdown = 12;
+    updateCycleDisplay();
+    clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+      cycleCountdown--;
+      updateCycleDisplay();
+      if (cycleCountdown <= 0) {
+        modeIndex = (modeOrder.indexOf(modeActual) + 1) % modeOrder.length;
+        applyMode(modeOrder[modeIndex]);
+        cycleCountdown = 12;
+      }
+    }, 1000);
+  }
+
+  function clearAutoCycle() {
+    clearInterval(countdownInterval);
+    document.getElementById('cycle-display').textContent = '';
+  }
+
+  function updateCycleDisplay() {
+    if (autoEnabled) {
+      document.getElementById('cycle-display').textContent =
+        `Próximo ciclo en ${cycleCountdown}s`;
+    }
+  }
+
+  function toggleAuto() {
+    if (!isActive) return;
+    autoEnabled = !autoEnabled;
+    document.getElementById('auto-toggle').classList.toggle('on', autoEnabled);
+    if (autoEnabled) startAutoCycle();
+    else clearAutoCycle();
+  }
+
+  // ─── BITÁCORA ────────────────────────────────────────────────────────────────
+  function setCategory(el, cat) {
+    currentCat = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function anclar() {
+    const input = document.getElementById('log-input');
+    const val = input.value.trim();
+    if (!val) return;
+
+    const entry = {
+      texto: val,
+      categoria: currentCat,
+      hora: new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }),
+      modo: modeActual
+    };
+
+    logEntries.unshift(entry);
+    stats[currentCat] = (stats[currentCat] || 0) + 1;
+    input.value = '';
+    renderLogs();
+    updateStats();
+  }
+
+  function renderLogs() {
+    const list = document.getElementById('log-list');
+
+    if (logEntries.length === 0) {
+      list.innerHTML = '<div class="log-empty">Sin registros aún.<br>Ancla tu primer éxito.</div>';
+      return;
+    }
+
+    list.innerHTML = logEntries.slice(0, 12).map(e => `
+      <div class="log-entry">
+        <div class="log-dot ${e.categoria}"></div>
+        <div class="log-body">
+          <div class="log-text">${e.texto}</div>
+          <div class="log-time">${e.hora} · ${DIMENSIONES[e.modo]?.hz || '—'}Hz</div>
+        </div>
+      </div>
+    `).join('');
+
+    document.getElementById('log-count').textContent = logEntries.length + ' registros';
+  }
+
+  function updateStats() {
+    document.getElementById('stat-dinero').textContent = stats.dinero;
+    document.getElementById('stat-paz').textContent = stats.paz + stats.atraccion;
+    document.getElementById('stat-total').textContent = logEntries.length;
+  }
+
+  // ─── CLOCK ───────────────────────────────────────────────────────────────────
+  function updateClock() {
+    document.getElementById('clock-display').textContent =
+      new Date().toLocaleTimeString('es-MX');
+  }
+
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // ─── FULLSCREEN ──────────────────────────────────────────────────────────────
+  function toggleFS() {
+    const el = document.documentElement;
+    if (!document.fullscreenElement) {
+      (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen).call(el);
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen).call(document);
+    }
+  }
+
+  // ─── INIT DISPLAY ────────────────────────────────────────────────────────────
+  applyMode('abundancia');
+  document.getElementById('freq-display').textContent = '—';
+  document.getElementById('dimension-name').textContent = '— Portal Latente —';
+  document.getElementById('freq-fill').style.width = '0%';
+  </script>
+
+
+</body></html>
